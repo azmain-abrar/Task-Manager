@@ -1,0 +1,1081 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow Pro | Productivity Hub</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-[#0b1020] text-white min-h-screen">
+
+<div class="flex min-h-screen">
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="w-64 bg-[#111827] border-r border-slate-800 p-5 hidden md:flex flex-col">
+
+    <div class="mb-8">
+        <h1 class="text-2xl font-extrabold text-blue-400">
+            TaskFlow Pro
+        </h1>
+        <p class="text-gray-400 text-xs mt-1">
+            Smart Productivity Hub
+        </p>
+    </div>
+
+    <button onclick="openModal()"
+        class="w-full py-3 rounded-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition mb-7">
+        + New Task
+    </button>
+
+    <nav class="space-y-2">
+
+        <button onclick="setView('dashboard')"
+            data-view="dashboard"
+            class="nav-btn active w-full text-left p-3 rounded-xl">
+            ◫ Dashboard
+        </button>
+
+        <button onclick="setView('all')"
+            data-view="all"
+            class="nav-btn w-full text-left p-3 rounded-xl">
+            ☰ Tasks
+        </button>
+
+        <button onclick="setView('categories')"
+            data-view="categories"
+            class="nav-btn w-full text-left p-3 rounded-xl">
+            ◈ Categories
+        </button>
+
+        <button onclick="setView('completed')"
+            data-view="completed"
+            class="nav-btn w-full text-left p-3 rounded-xl">
+            ✓ Completed
+        </button>
+
+    </nav>
+
+    <div class="mt-auto border-t border-slate-800 pt-5">
+        <p class="text-xs text-gray-500">PRODUCTIVITY HUB</p>
+        <p class="text-sm text-gray-400 mt-2">
+            Stay focused. Get things done.
+        </p>
+    </div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
+
+    <!-- MOBILE HEADER -->
+
+    <div class="flex justify-between items-center mb-6 md:hidden">
+
+        <h1 class="text-xl font-extrabold text-blue-400">
+            TaskFlow Pro
+        </h1>
+
+        <button onclick="openModal()"
+            class="bg-blue-600 px-4 py-2 rounded-lg">
+            + New Task
+        </button>
+
+    </div>
+
+    <!-- MOBILE NAV -->
+
+    <div class="flex gap-2 overflow-x-auto mb-6 md:hidden">
+
+        <button onclick="setView('dashboard')"
+            class="nav-btn active px-3 py-2 rounded-lg whitespace-nowrap"
+            data-view="dashboard">
+            Dashboard
+        </button>
+
+        <button onclick="setView('all')"
+            class="nav-btn px-3 py-2 rounded-lg whitespace-nowrap"
+            data-view="all">
+            Tasks
+        </button>
+
+        <button onclick="setView('categories')"
+            class="nav-btn px-3 py-2 rounded-lg whitespace-nowrap"
+            data-view="categories">
+            Categories
+        </button>
+
+        <button onclick="setView('completed')"
+            class="nav-btn px-3 py-2 rounded-lg whitespace-nowrap"
+            data-view="completed">
+            Completed
+        </button>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <div class="max-w-xl mb-7">
+
+        <input id="searchInput"
+            type="text"
+            placeholder="🔎 Search tasks, categories..."
+            oninput="renderTasks()"
+            class="w-full p-3.5 rounded-xl bg-[#141d30] border border-slate-700 text-white placeholder-gray-500 outline-none focus:border-blue-500 transition">
+
+    </div>
+
+
+    <!-- HEADER -->
+
+    <div class="mb-8">
+
+        <h2 id="pageTitle"
+            class="text-3xl sm:text-4xl lg:text-5xl font-extrabold">
+            Manage your day like a pro.
+        </h2>
+
+        <p class="text-gray-400 mt-3">
+            Track work and personal tasks, organize your day and keep your progress moving.
+        </p>
+
+    </div>
+
+
+    <!-- ================= STATISTICS ================= -->
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+
+        <div class="bg-[#141d30] border border-slate-700/70 p-5 rounded-2xl">
+            <p class="text-gray-400 text-sm">Total Tasks</p>
+            <h2 id="totalTasks" class="text-3xl font-bold mt-3">0</h2>
+            <p class="text-blue-400 text-xs mt-2">All tasks</p>
+        </div>
+
+        <div class="bg-[#141d30] border border-slate-700/70 p-5 rounded-2xl">
+            <p class="text-gray-400 text-sm">Completed</p>
+            <h2 id="completedTasks" class="text-3xl font-bold text-green-400 mt-3">0</h2>
+            <p class="text-green-400 text-xs mt-2">Finished tasks</p>
+        </div>
+
+        <div class="bg-[#141d30] border border-slate-700/70 p-5 rounded-2xl">
+            <p class="text-gray-400 text-sm">Pending</p>
+            <h2 id="pendingTasks" class="text-3xl font-bold text-orange-400 mt-3">0</h2>
+            <p class="text-orange-400 text-xs mt-2">Remaining tasks</p>
+        </div>
+
+        <div class="bg-[#141d30] border border-slate-700/70 p-5 rounded-2xl">
+            <p class="text-gray-400 text-sm">Progress</p>
+            <h2 id="progressText" class="text-3xl font-bold mt-3">0%</h2>
+
+            <div class="w-full bg-slate-700 h-2 rounded-full mt-3 overflow-hidden">
+                <div id="progressBar"
+                    class="bg-gradient-to-r from-blue-500 to-purple-500 h-full rounded-full transition-all"
+                    style="width:0%">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ================= FILTERS ================= -->
+
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+
+        <div class="flex gap-2 flex-wrap">
+
+            <button onclick="setFilter('all',this)"
+                class="filter-btn active px-4 py-2 rounded-lg">
+                All
+            </button>
+
+            <button onclick="setFilter('pending',this)"
+                class="filter-btn px-4 py-2 rounded-lg">
+                Pending
+            </button>
+
+            <button onclick="setFilter('completed',this)"
+                class="filter-btn px-4 py-2 rounded-lg">
+                Completed
+            </button>
+
+        </div>
+
+        <select id="categoryFilter"
+            onchange="renderTasks()"
+            class="bg-[#141d30] border border-slate-700 p-2.5 rounded-lg text-white">
+
+            <option value="all">All Categories</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Study">Study</option>
+            <option value="Other">Other</option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ================= CONTENT GRID ================= -->
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        <!-- TASK LIST -->
+
+        <section class="lg:col-span-2 bg-[#141d30] border border-slate-700/70 rounded-2xl p-5">
+
+            <div class="flex justify-between items-center mb-5">
+
+                <div>
+                    <h3 class="text-xl font-bold">Your Tasks</h3>
+
+                    <p class="text-gray-400 text-sm mt-1">
+                        Drag and drop cards to sort your priorities.
+                    </p>
+                </div>
+
+                <button onclick="openModal()"
+                    class="hidden sm:block bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm">
+                    + Add
+                </button>
+
+            </div>
+
+            <div id="taskList" class="space-y-4"></div>
+
+        </section>
+
+
+        <!-- ================= QUICK INSIGHTS ================= -->
+
+        <section class="bg-[#141d30] border border-slate-700/70 rounded-2xl p-5 h-fit">
+
+            <h3 class="text-xl font-bold mb-6">
+                Quick Insights
+            </h3>
+
+            <div class="space-y-5">
+
+                <div class="flex justify-between border-b border-slate-700 pb-4">
+                    <span class="text-gray-300">Work Tasks</span>
+                    <strong id="workCount">0</strong>
+                </div>
+
+                <div class="flex justify-between border-b border-slate-700 pb-4">
+                    <span class="text-gray-300">Personal Tasks</span>
+                    <strong id="personalCount">0</strong>
+                </div>
+
+                <div class="flex justify-between border-b border-slate-700 pb-4">
+                    <span class="text-gray-300">Study Tasks</span>
+                    <strong id="studyCount">0</strong>
+                </div>
+
+                <div class="flex justify-between border-b border-slate-700 pb-4">
+                    <span class="text-gray-300">Done Today</span>
+                    <strong id="doneToday" class="text-green-400">0</strong>
+                </div>
+
+            </div>
+
+            <div class="mt-7">
+
+                <p class="text-sm text-gray-400 mb-3">
+                    Overall Progress
+                </p>
+
+                <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+
+                    <div id="insightProgress"
+                        class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+                <p id="insightMessage"
+                    class="text-sm text-gray-400 mt-4">
+                    Start adding tasks to see your progress.
+                </p>
+
+            </div>
+
+            <p class="text-xs text-green-400 mt-6">
+                ✓ Your tasks are saved automatically
+            </p>
+
+        </section>
+
+    </div>
+
+
+    <footer class="text-center text-gray-600 text-xs mt-10">
+        TaskFlow Pro © 2026 | Smart Productivity Hub
+    </footer>
+
+</main>
+
+</div>
+
+
+<!-- ================= PREMIUM MODAL ================= -->
+
+<dialog id="taskModal"
+    class="w-[min(94%,520px)] max-w-[520px] m-auto p-0 bg-gradient-to-br from-slate-800 to-slate-950 text-white border border-slate-700 rounded-3xl shadow-2xl backdrop:bg-black/80 backdrop:backdrop-blur-md">
+
+    <div class="p-6 sm:p-8">
+
+        <!-- MODAL HEADER -->
+
+        <div class="flex justify-between items-start mb-7">
+
+            <div>
+                <h2 id="modalTitle"
+                    class="text-2xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    Create New Task
+                </h2>
+
+                <p class="text-slate-400 text-sm mt-2">
+                    Organize your work and stay productive.
+                </p>
+            </div>
+
+            <button type="button"
+                onclick="closeModal()"
+                class="w-9 h-9 rounded-xl bg-slate-700 hover:bg-red-500 text-gray-300 hover:text-white text-2xl transition hover:rotate-90">
+                &times;
+            </button>
+
+        </div>
+
+
+        <!-- MODAL FORM -->
+
+        <form id="taskForm" class="space-y-5">
+
+            <input type="hidden" id="editId">
+
+
+            <!-- TITLE -->
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">
+                    Task Title *
+                </label>
+
+                <input id="taskTitle"
+                    type="text"
+                    placeholder="✦ Enter your task title"
+                    required
+                    class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition">
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">
+                    Description
+                </label>
+
+                <textarea id="taskDescription"
+                    rows="3"
+                    placeholder="Write something about your task..."
+                    class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 outline-none resize-y focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition"></textarea>
+            </div>
+
+
+            <!-- CATEGORY AND PRIORITY -->
+
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">
+                        Category
+                    </label>
+
+                    <select id="taskCategory"
+                        class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500">
+
+                        <option value="Work">💼 Work</option>
+                        <option value="Personal">👤 Personal</option>
+                        <option value="Study">📚 Study</option>
+                        <option value="Other">✨ Other</option>
+
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">
+                        Priority
+                    </label>
+
+                    <select id="taskPriority"
+                        class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500">
+
+                        <option value="High">🔴 High</option>
+                        <option value="Medium" selected>🟡 Medium</option>
+                        <option value="Low">🟢 Low</option>
+
+                    </select>
+                </div>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-2">
+                    Due Date
+                </label>
+
+                <input id="taskDate"
+                    type="date"
+                    class="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="flex gap-3 pt-3">
+
+                <button type="submit"
+                    class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/20 hover:-translate-y-1 active:scale-95 transition duration-300">
+
+                    ✦ Save Task
+
+                </button>
+
+                <button type="button"
+                    onclick="closeModal()"
+                    class="px-6 py-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition">
+
+                    Cancel
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</dialog>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+// STORAGE
+
+const STORAGE_KEY = "taskflow_pro_tasks_v2";
+
+function loadTasks() {
+
+    try {
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return Array.isArray(data) ? data : [];
+    } catch {
+        return [];
+    }
+
+}
+
+let tasks = loadTasks();
+
+let currentFilter = "all";
+let currentView = "dashboard";
+let draggedId = null;
+
+
+// SAVE DATA
+
+function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+
+// MODAL
+
+const modal = document.getElementById("taskModal");
+
+function openModal(id = null) {
+
+    document.getElementById("taskForm").reset();
+    document.getElementById("editId").value = "";
+
+    if (id !== null) {
+
+        const task = tasks.find(t => t.id === id);
+
+        if (!task) return;
+
+        document.getElementById("modalTitle").textContent = "Edit Task";
+
+        document.getElementById("editId").value = task.id;
+        document.getElementById("taskTitle").value = task.title;
+        document.getElementById("taskDescription").value = task.description;
+        document.getElementById("taskCategory").value = task.category;
+        document.getElementById("taskPriority").value = task.priority;
+        document.getElementById("taskDate").value = task.date;
+
+    } else {
+
+        document.getElementById("modalTitle").textContent = "Create New Task";
+
+    }
+
+    modal.showModal();
+
+    setTimeout(() => {
+        document.getElementById("taskTitle").focus();
+    }, 50);
+
+}
+
+function closeModal() {
+    modal.close();
+}
+
+
+// CLOSE WHEN CLICKING BACKDROP
+
+modal.addEventListener("click", function(e) {
+
+    if (e.target === modal) {
+        closeModal();
+    }
+
+});
+
+
+// ADD / EDIT TASK
+
+document.getElementById("taskForm").addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const editId = document.getElementById("editId").value;
+
+    const data = {
+
+        title: document.getElementById("taskTitle").value.trim(),
+
+        description: document.getElementById("taskDescription").value.trim(),
+
+        category: document.getElementById("taskCategory").value,
+
+        priority: document.getElementById("taskPriority").value,
+
+        date: document.getElementById("taskDate").value
+
+    };
+
+    if (!data.title) return;
+
+    if (editId) {
+
+        const task = tasks.find(t => t.id === editId);
+
+        if (task) {
+            Object.assign(task, data);
+        }
+
+    } else {
+
+        tasks.unshift({
+
+            id: Date.now().toString() + Math.random().toString(36).slice(2),
+
+            ...data,
+
+            completed: false,
+
+            createdAt: new Date().toISOString(),
+
+            completedAt: null
+
+        });
+
+    }
+
+    saveTasks();
+    closeModal();
+    updateDashboard();
+
+});
+
+
+// DELETE TASK
+
+function deleteTask(id) {
+
+    if (!confirm("Are you sure you want to delete this task?")) return;
+
+    tasks = tasks.filter(t => t.id !== id);
+
+    saveTasks();
+    updateDashboard();
+
+}
+
+
+// COMPLETE / UNDO
+
+function toggleComplete(id) {
+
+    const task = tasks.find(t => t.id === id);
+
+    if (!task) return;
+
+    task.completed = !task.completed;
+
+    task.completedAt = task.completed
+        ? new Date().toISOString()
+        : null;
+
+    saveTasks();
+    updateDashboard();
+
+}
+
+
+// FILTER
+
+function setFilter(filter, button) {
+
+    currentFilter = filter;
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    renderTasks();
+
+}
+
+
+// NAVIGATION
+
+function setView(view) {
+
+    currentView = view;
+
+    const titles = {
+
+        dashboard: "Manage your day like a pro.",
+
+        all: "All Your Tasks",
+
+        categories: "Manage Your Categories",
+
+        completed: "Completed Tasks"
+
+    };
+
+    document.getElementById("pageTitle").textContent = titles[view];
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+
+        btn.classList.toggle("active", btn.dataset.view === view);
+
+    });
+
+    if (view === "completed") {
+        currentFilter = "completed";
+    } else {
+        currentFilter = "all";
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+
+        btn.classList.toggle(
+            "active",
+            btn.textContent.trim().toLowerCase() === currentFilter
+        );
+
+    });
+
+    renderTasks();
+
+}
+
+
+// CREATE ELEMENT
+
+function makeElement(tag, className, text) {
+
+    const el = document.createElement(tag);
+
+    el.className = className;
+
+    if (text !== undefined) {
+        el.textContent = text;
+    }
+
+    return el;
+
+}
+
+
+// RENDER TASKS
+
+function renderTasks() {
+
+    const list = document.getElementById("taskList");
+
+    list.innerHTML = "";
+
+    const search = document.getElementById("searchInput").value.toLowerCase();
+
+    const category = document.getElementById("categoryFilter").value;
+
+
+    // CATEGORY PAGE
+
+    if (currentView === "categories") {
+
+        ["Work", "Personal", "Study", "Other"].forEach(cat => {
+
+            const count = tasks.filter(t => t.category === cat).length;
+
+            const btn = makeElement(
+                "button",
+                "w-full flex justify-between items-center p-5 mb-3 rounded-xl bg-slate-800 border border-slate-700 hover:border-blue-500 transition text-left",
+                ""
+            );
+
+            const name = makeElement("span", "font-semibold", cat + " Tasks");
+
+            const number = makeElement("span", "text-blue-400 font-bold", count);
+
+            btn.append(name, number);
+
+            btn.addEventListener("click", () => {
+
+                document.getElementById("categoryFilter").value = cat;
+
+                setView("all");
+
+                renderTasks();
+
+            });
+
+            list.appendChild(btn);
+
+        });
+
+        return;
+
+    }
+
+
+    // FILTER DATA
+
+    const filtered = tasks.filter(task => {
+
+        const matchFilter =
+            currentFilter === "all" ||
+            (currentFilter === "pending" && !task.completed) ||
+            (currentFilter === "completed" && task.completed);
+
+        const matchSearch =
+            task.title.toLowerCase().includes(search) ||
+            task.description.toLowerCase().includes(search) ||
+            task.category.toLowerCase().includes(search);
+
+        const matchCategory =
+            category === "all" || task.category === category;
+
+        return matchFilter && matchSearch && matchCategory;
+
+    });
+
+
+    // EMPTY MESSAGE
+
+    if (filtered.length === 0) {
+
+        const empty = makeElement(
+            "div",
+            "text-center py-12 text-gray-500",
+            "✦ No tasks found! Add a new task to get started."
+        );
+
+        list.appendChild(empty);
+
+        return;
+
+    }
+
+
+    // TASK CARDS
+
+    filtered.forEach(task => {
+
+        const card = makeElement(
+            "div",
+            "bg-[#111b2d] border border-slate-700 rounded-2xl p-5 hover:border-blue-500 transition"
+        );
+
+        card.draggable = true;
+
+
+        // DRAG EVENTS
+
+        card.addEventListener("dragstart", () => {
+
+            draggedId = task.id;
+
+            card.classList.add("opacity-40");
+
+        });
+
+        card.addEventListener("dragend", () => {
+
+            draggedId = null;
+
+            card.classList.remove("opacity-40");
+
+            document.querySelectorAll(".drop-target").forEach(el => {
+                el.classList.remove("drop-target", "border-blue-500");
+            });
+
+        });
+
+        card.addEventListener("dragover", e => {
+
+            e.preventDefault();
+
+            card.classList.add("drop-target", "border-blue-500");
+
+        });
+
+        card.addEventListener("dragleave", () => {
+
+            card.classList.remove("drop-target", "border-blue-500");
+
+        });
+
+        card.addEventListener("drop", e => {
+
+            e.preventDefault();
+
+            card.classList.remove("drop-target", "border-blue-500");
+
+            if (!draggedId || draggedId === task.id) return;
+
+            const from = tasks.findIndex(t => t.id === draggedId);
+
+            const to = tasks.findIndex(t => t.id === task.id);
+
+            if (from < 0 || to < 0) return;
+
+            const moved = tasks.splice(from, 1)[0];
+
+            tasks.splice(to, 0, moved);
+
+            saveTasks();
+
+            renderTasks();
+
+        });
+
+
+        // TOP CONTENT
+
+        const top = makeElement("div", "flex items-start gap-3");
+
+        const check = makeElement(
+            "button",
+            task.completed
+                ? "w-6 h-6 rounded-full bg-blue-500 text-white flex-shrink-0"
+                : "w-6 h-6 rounded-full border-2 border-slate-500 flex-shrink-0 hover:border-blue-500",
+            task.completed ? "✓" : ""
+        );
+
+        check.addEventListener("click", () => toggleComplete(task.id));
+
+        const content = makeElement("div", "flex-1 min-w-0");
+
+        const heading = makeElement(
+            "h3",
+            "font-bold text-lg break-words " +
+            (task.completed ? "line-through text-gray-500" : "text-white"),
+            task.title
+        );
+
+        const description = makeElement(
+            "p",
+            "text-sm text-gray-400 mt-2 break-words",
+            task.description || "No description"
+        );
+
+        content.append(heading, description);
+
+        top.append(check, content);
+
+
+        // BADGES
+
+        const badges = makeElement("div", "flex flex-wrap gap-2 mt-4 ml-9");
+
+        const categoryBadge = makeElement(
+            "span",
+            "text-xs px-3 py-1 rounded-full bg-blue-500/15 text-blue-400",
+            task.category
+        );
+
+        const priorityColor = {
+
+            High: "bg-red-500/15 text-red-400",
+
+            Medium: "bg-yellow-500/15 text-yellow-400",
+
+            Low: "bg-green-500/15 text-green-400"
+
+        };
+
+        const priorityBadge = makeElement(
+            "span",
+            "text-xs px-3 py-1 rounded-full " + priorityColor[task.priority],
+            task.priority + " Priority"
+        );
+
+        badges.append(categoryBadge, priorityBadge);
+
+
+        // DATE
+
+        const date = makeElement(
+            "p",
+            "text-xs text-gray-500 mt-3 ml-9",
+            task.date ? "Due: " + task.date : "No due date"
+        );
+
+
+        // ACTION BUTTONS
+
+        const actions = makeElement("div", "flex flex-wrap gap-2 mt-4 ml-9");
+
+        const complete = makeElement(
+            "button",
+            "bg-green-500/15 text-green-400 hover:bg-green-600 hover:text-white px-3 py-2 rounded-lg text-sm transition",
+            task.completed ? "Undo" : "✓ Complete"
+        );
+
+        complete.addEventListener("click", () => toggleComplete(task.id));
+
+
+        const edit = makeElement(
+            "button",
+            "bg-blue-500/15 text-blue-400 hover:bg-blue-600 hover:text-white px-3 py-2 rounded-lg text-sm transition",
+            "Edit"
+        );
+
+        edit.addEventListener("click", () => openModal(task.id));
+
+
+        const del = makeElement(
+            "button",
+            "bg-red-500/15 text-red-400 hover:bg-red-600 hover:text-white px-3 py-2 rounded-lg text-sm transition",
+            "Delete"
+        );
+
+        del.addEventListener("click", () => deleteTask(task.id));
+
+
+        actions.append(complete, edit, del);
+
+        card.append(top, badges, date, actions);
+
+        list.appendChild(card);
+
+    });
+
+}
+
+
+// DASHBOARD UPDATE
+
+function updateDashboard() {
+
+    const total = tasks.length;
+
+    const completed = tasks.filter(t => t.completed).length;
+
+    const pending = total - completed;
+
+    const progress = total > 0
+        ? Math.round(completed / total * 100)
+        : 0;
+
+
+    document.getElementById("totalTasks").textContent = total;
+
+    document.getElementById("completedTasks").textContent = completed;
+
+    document.getElementById("pendingTasks").textContent = pending;
+
+    document.getElementById("progressText").textContent = progress + "%";
+
+    document.getElementById("progressBar").style.width = progress + "%";
+
+    document.getElementById("insightProgress").style.width = progress + "%";
+
+
+    document.getElementById("workCount").textContent =
+        tasks.filter(t => t.category === "Work").length;
+
+    document.getElementById("personalCount").textContent =
+        tasks.filter(t => t.category === "Personal").length;
+
+    document.getElementById("studyCount").textContent =
+        tasks.filter(t => t.category === "Study").length;
+
+
+    const today = new Date().toLocaleDateString();
+
+    document.getElementById("doneToday").textContent =
+        tasks.filter(t =>
+            t.completed &&
+            t.completedAt &&
+            new Date(t.completedAt).toLocaleDateString() === today
+        ).length;
+
+
+    document.getElementById("insightMessage").textContent =
+
+        total === 0
+            ? "Start adding tasks to see your progress."
+            : progress === 100
+            ? "Excellent! All your tasks are completed."
+            : pending + " tasks remaining. Keep going!";
+
+
+    renderTasks();
+
+}
+
+
+// INITIALIZE
+
+updateDashboard();
+
+</script>
+
+</body>
+</html>
